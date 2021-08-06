@@ -1,1 +1,0 @@
-export declare function usePromiseState<T, Args extends any[]>(asyncFn: (...args: Args) => Promise<T>, initialArgs?: Args): readonly [Promise<T>, (...args: Args) => Promise<T>, (p: Promise<T>) => boolean];

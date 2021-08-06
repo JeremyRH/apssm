@@ -215,9 +215,9 @@ function scheduleSubscribers(context: Context, atom: Atom) {
 			context[scheduledPromiseSym] = Promise.resolve();
 			context[subscribersBeingCalledSym] = true;
 
-			Array.from(subscribersQueue.entries()).forEach(([atm, subs]) => {
+			for (const [atm, subs] of Array.from(subscribersQueue.entries())) {
 				callSubscribers(subs, getValue(context, atm));
-			});
+			}
 
 			context[subscribersBeingCalledSym] = false;
 			subscribersQueue.clear();
@@ -240,11 +240,11 @@ function validateDependencies(dependencies: (Atom | DerivedAtom)[]): asserts dep
 		throw new TypeError('Derived state must have at least 1 dependency');
 	}
 
-	dependencies.forEach((atom) => {
+	for (const atom of dependencies) {
 		if (!atom || (!isAtom(atom) && !isDerivedAtom(atom))) {
 			throw new TypeError('A derived state dependency is not an atom');
 		}
-	});
+	}
 }
 
 function isAtom<A extends Atom>(atom: A | DerivedAtom): atom is A {
