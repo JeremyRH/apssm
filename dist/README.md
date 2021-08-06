@@ -8,10 +8,10 @@ apssm - Atomic Publish/Subscribe State Manager. A set of functions to create ato
 npm install apssm
 ```
 
-```tsx
-import { createState, createContext } from 'apssm';
+```ts
+import { create, createContext } from 'apssm';
 
-const countState = createState((c = 0) => c);
+const countState = create((c: number) => c, 0);
 const context = createContext();
 
 let count = context.get(countState); // get

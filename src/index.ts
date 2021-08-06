@@ -136,6 +136,10 @@ function subscribe<A extends Atom | DerivedAtom>(
 	atom: A,
 	callback: Subscriber<AtomValue<A>>
 ): () => boolean {
+	if (context[subscribersBeingCalledSym]) {
+		throw new Error('Cannot subscribe while subscriber callbacks are being called');
+	}
+
 	if (isDerivedAtom(atom)) {
 		if (sym === syncSubscribersSym) {
 			throw new TypeError('Derived atoms cannot be sync subscribed');
@@ -165,10 +169,6 @@ function subscribe<A extends Atom | DerivedAtom>(
 			}
 			return allUnsub;
 		};
-	}
-
-	if (context[subscribersBeingCalledSym]) {
-		throw new Error('Cannot subscribe while subscriber callbacks are being called');
 	}
 
 	const subscribersMap = context[sym];
@@ -237,12 +237,12 @@ function callSubscribers(subscribers: Set<Subscriber>, value: any) {
 
 function validateDependencies(dependencies: (Atom | DerivedAtom)[]): asserts dependencies is (Atom | DerivedAtom)[] {
 	if (!dependencies.length) {
-		throw new TypeError('Derived state must have at least 1 dependency');
+		throw new TypeError('Derived atoms must have at least 1 dependency');
 	}
 
 	for (const atom of dependencies) {
 		if (!atom || (!isAtom(atom) && !isDerivedAtom(atom))) {
-			throw new TypeError('A derived state dependency is not an atom');
+			throw new TypeError('A derived atom\'s dependency is not an atom');
 		}
 	}
 }

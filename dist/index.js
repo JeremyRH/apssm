@@ -82,6 +82,9 @@ function setValue(context, atom, ...args) {
     return value;
 }
 function subscribe(sym, context, atom, callback) {
+    if (context[subscribersBeingCalledSym]) {
+        throw new Error('Cannot subscribe while subscriber callbacks are being called');
+    }
     if (isDerivedAtom(atom)) {
         if (sym === syncSubscribersSym) {
             throw new TypeError('Derived atoms cannot be sync subscribed');
@@ -107,9 +110,6 @@ function subscribe(sym, context, atom, callback) {
             }
             return allUnsub;
         };
-    }
-    if (context[subscribersBeingCalledSym]) {
-        throw new Error('Cannot subscribe while subscriber callbacks are being called');
     }
     const subscribersMap = context[sym];
     let subscribers = subscribersMap.get(atom);
@@ -165,11 +165,11 @@ function callSubscribers(subscribers, value) {
 }
 function validateDependencies(dependencies) {
     if (!dependencies.length) {
-        throw new TypeError('Derived state must have at least 1 dependency');
+        throw new TypeError('Derived atoms must have at least 1 dependency');
     }
     for (const atom of dependencies) {
         if (!atom || (!isAtom(atom) && !isDerivedAtom(atom))) {
-            throw new TypeError('A derived state dependency is not an atom');
+            throw new TypeError('A derived atom\'s dependency is not an atom');
         }
     }
 }
